@@ -1,0 +1,21 @@
+---
+- name: Require Debian-family support server
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "Debian"
+    fail_msg: "This example role supports Debian-family support servers only."
+  when: server_hardening_enable | bool
+
+- name: Disable IPv4 source routing and ICMP redirects
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "0"
+    state: present
+    sysctl_file: /etc/sysctl.d/60-sgif-network-hardening.conf
+    reload: true
+  loop:
+    - { name: net.ipv4.conf.all.accept_redirects }
+    - { name: net.ipv4.conf.default.accept_redirects }
+    - { name: net.ipv4.conf.all.accept_source_route }
+    - { name: net.ipv4.conf.default.accept_source_route }
+  when: server_hardening_enable | bool

@@ -1,0 +1,21 @@
+name: Deployment preflight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ansible-core
+      - run: ansible-galaxy collection install ansible.posix community.general
+      - run: ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i ansible/inventories/example.yml ansible/playbooks/site.yml --syntax-check
+      - name: Explain deployment boundary
+        run: echo "Preflight only. This workflow does not connect to or configure site hosts."

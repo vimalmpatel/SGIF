@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "site_name": "Example Renewable Site",
+  "assets": [
+    {
+      "asset_id": "EX-SOLAR-001",
+      "name": "Example photovoltaic inverter",
+      "asset_type": "inverter",
+      "zone": "generation",
+      "criticality": "high",
+      "owner": "site-operations"
+    },
+    {
+      "asset_id": "EX-CONTROL-001",
+      "name": "Example monitoring workstation",
+      "asset_type": "workstation",
+      "zone": "monitoring",
+      "criticality": "moderate",
+      "owner": "site-operations"
+    }
+  ]
+}

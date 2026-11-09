@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.ansible/
+*.retry
+*.vault.yml
+*.vault.yaml
+ansible/inventories/local.yml
+ansible/inventories/production.yml
+ansible/inventories/host_vars/
+ansible/inventories/group_vars/
+*.log

@@ -1,0 +1,7 @@
+---
+- name: Explain database security role status
+  ansible.builtin.fail:
+    msg: >-
+      Database security is not configured. Select and review the database
+      engine, data classification, backup, and recovery requirements first.
+  when: database_security_enable | bool

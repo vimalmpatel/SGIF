@@ -1,0 +1,4 @@
+---
+ssh_security_enable: false
+ssh_security_key_auth_confirmed: false
+ssh_security_service_name: ssh

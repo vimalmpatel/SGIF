@@ -1,0 +1,4 @@
+---
+firewall_enable: false
+firewall_management_port: 22
+firewall_allowed_tcp_ports: []

@@ -1,0 +1,7 @@
+---
+- name: Explain application security role status
+  ansible.builtin.fail:
+    msg: >-
+      Application security is not configured. Select and review the application
+      stack and its deployment model before enabling this role.
+  when: application_security_enable | bool

@@ -1,0 +1,22 @@
+---
+- name: Require Debian-family support server
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "Debian"
+    fail_msg: "This example role supports Debian-family support servers only."
+  when: audit_logging_enable | bool
+
+- name: Install auditd
+  ansible.builtin.apt:
+    name: auditd
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: audit_logging_enable | bool
+
+- name: Enable and start auditd
+  ansible.builtin.service:
+    name: auditd
+    enabled: true
+    state: started
+  when: audit_logging_enable | bool

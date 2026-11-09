@@ -1,0 +1,32 @@
+---
+- name: Require verified key-based access before SSH hardening
+  ansible.builtin.assert:
+    that:
+      - ssh_security_key_auth_confirmed | bool
+    fail_msg: >-
+      Confirm a working key-based login and out-of-band recovery, then set
+        ssh_security_key_auth_confirmed=true.
+      when: ssh_security_enable | bool
+
+- name: Require Debian-family support server
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "Debian"
+    fail_msg: "This example role supports Debian-family support servers only."
+  when: ssh_security_enable | bool
+
+- name: Install SSH server hardening drop-in
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/60-sgif-security.conf
+    content: |
+      PermitRootLogin no
+      PubkeyAuthentication yes
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      X11Forwarding no
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "/usr/sbin/sshd -t -f %s"
+  notify: Reload SSH service
+  when: ssh_security_enable | bool

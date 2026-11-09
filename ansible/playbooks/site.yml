@@ -1,0 +1,13 @@
+---
+- name: Apply explicitly enabled SGIF support-server controls
+  hosts: support_servers
+  gather_facts: true
+  become: true
+  roles:
+    - role: server_hardening
+    - role: ssh_security
+    - role: firewall
+    - role: nginx_security
+    - role: application_security
+    - role: database_security
+    - role: audit_logging

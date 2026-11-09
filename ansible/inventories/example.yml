@@ -1,0 +1,4 @@
+all:
+  children:
+    support_servers:
+      hosts: {}

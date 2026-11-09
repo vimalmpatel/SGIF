@@ -1,0 +1,18 @@
+---
+- name: Require Debian-family support server
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "Debian"
+    fail_msg: "This example role supports Debian-family support servers only."
+  when: nginx_security_enable | bool
+
+- name: Install Nginx security settings
+  ansible.builtin.copy:
+    dest: /etc/nginx/conf.d/60-sgif-security.conf
+    content: |
+      server_tokens off;
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Validate and reload Nginx
+  when: nginx_security_enable | bool

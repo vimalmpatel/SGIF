@@ -1,0 +1,43 @@
+---
+- name: Require Debian-family support server
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "Debian"
+    fail_msg: "This example role supports Debian-family support servers only."
+  when: firewall_enable | bool
+
+- name: Ensure management port remains allowed
+  ansible.builtin.assert:
+    that:
+      - firewall_management_port | int in (firewall_allowed_tcp_ports | map('int') | list)
+    fail_msg: >-
+      Add the actual management port to firewall_allowed_tcp_ports before
+      enabling UFW, or remote access may be lost.
+  when: firewall_enable | bool
+
+- name: Install UFW
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: firewall_enable | bool
+
+- name: Allow configured TCP ports
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ firewall_allowed_tcp_ports }}"
+  when: firewall_enable | bool
+
+- name: Set default incoming policy to deny
+  community.general.ufw:
+    direction: incoming
+    policy: deny
+  when: firewall_enable | bool
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  when: firewall_enable | bool
