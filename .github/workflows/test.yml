@@ -2,33 +2,55 @@ name: Tests
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   python-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m unittest discover -s tests -v
-      - run: python sgif_inventory.py examples/site-inventory.json
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Validate example inventory
+        run: python sgif_inventory.py examples/site-inventory.json
 
   ansible-syntax:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       ANSIBLE_CONFIG: ansible/ansible.cfg
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install ansible-core ansible-lint
-      - run: ansible-galaxy collection install ansible.posix community.general
-      - run: ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i ansible/inventories/example.yml ansible/playbooks/site.yml --syntax-check
-      - run: ansible-lint ansible/playbooks/site.yml
+      - name: Install Ansible tooling
+        run: python -m pip install --disable-pip-version-check ansible-core ansible-lint
+      - name: Install required collections
+        run: ansible-galaxy collection install ansible.posix community.general
+      - name: Check playbook syntax (no hosts contacted)
+        run: ansible-playbook -i ansible/inventories/example.yml ansible/playbooks/site.yml --syntax-check
+      - name: Lint playbook
+        run: ansible-lint ansible/playbooks/site.yml
