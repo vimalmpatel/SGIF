@@ -6,10 +6,11 @@ examples in this repository are for **Debian/Ubuntu support servers only**.
 They are not for inverters, turbines, protection relays, controllers, or other
 operational technology (OT).
 
-The repository includes a local asset inventory validator and opt-in Ansible
-roles. The validator reads a local file only. Ansible roles make changes only
-when explicitly enabled and should first be reviewed and tested on a
-non-production support server.
+The repository includes a local asset inventory validator, an offline
+Suricata/Zeek event normalizer, and opt-in Ansible roles. The Python tools
+read operator-provided files only. Ansible roles make changes only when
+explicitly enabled and should first be reviewed and tested on a non-production
+support server.
 
 ## Quick start
 
@@ -18,6 +19,19 @@ Requires Python 3.10 or newer. From the repository root, run:
 ```sh
 python sgif_inventory.py examples/site-inventory.json
 ```
+
+Normalize synthetic Wazuh alert, Suricata EVE, or Zeek `conn.log` JSON records
+to a common JSONL format:
+
+```sh
+python -m application.event_ingest suricata examples/suricata-eve.sample.jsonl
+python -m application.event_ingest zeek examples/zeek-conn.sample.jsonl
+python -m application.event_ingest wazuh examples/wazuh-alert.sample.jsonl
+```
+
+Normalized events are written to standard output. The tool does not capture
+traffic, connect to sensors, determine whether an alert is a confirmed
+incident, or perform isolation actions. See [the application guide](application/README.md).
 
 The command exits with status `0` for a valid inventory and `1` for invalid
 data. Run the tests with:
@@ -64,7 +78,8 @@ site-specific review; they are not a compliance guarantee.
 The CI workflows run unit tests, inventory validation, Ansible syntax checks,
 Ansible linting, and CodeQL analysis. The manually triggered deployment
 workflow is a syntax preflight only: it does not connect to or configure
-servers.
+servers. Event processing is currently an offline parser prototype; FastAPI,
+PostgreSQL, Keycloak, and a dashboard are not implemented yet.
 
 See [the security architecture](security/architecture.md),
 [the threat model](security/threat-model.md), and

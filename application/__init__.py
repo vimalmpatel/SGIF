@@ -1,0 +1,1 @@
+"""SGIF application components."""

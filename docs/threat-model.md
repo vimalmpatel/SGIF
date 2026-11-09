@@ -5,13 +5,16 @@
 SGIF aims to help small renewable-energy site operators organize defensive
 cybersecurity work for solar, wind, and related grid-connected systems. The
 current repository includes offline inventory validation and opt-in Ansible
-examples for Debian/Ubuntu support servers only.
+examples for Debian/Ubuntu support servers only, plus offline normalization
+of exported Wazuh, Suricata EVE, and Zeek `conn.log` records.
 
 ## In scope for this starter
 
 - Validating a manually maintained JSON asset inventory.
 - Helping operators identify missing or inconsistent inventory fields.
 - Demonstrating opt-in host-hardening controls for support servers.
+- Normalizing operator-provided network event files without connecting to
+  sensors or site networks.
 - Using fictional data in public examples and tests.
 
 ## Out of scope
@@ -22,6 +25,7 @@ examples for Debian/Ubuntu support servers only.
   other operational technology.
 - Managing or changing production OT configurations or providing autonomous
   response actions.
+- Live packet capture, alert verdicts, or automatic isolation actions.
 - Storing secrets or real site-specific operational data in this public repo.
 
 ## Assumptions and risks
@@ -29,6 +33,8 @@ examples for Debian/Ubuntu support servers only.
 - Users may mistakenly publish sensitive topology, equipment, or ownership
   details. Public examples must remain synthetic, and real inventories should
   stay in access-controlled storage.
+- Exported Suricata/Zeek logs can reveal sensitive addresses and communication
+  patterns; keep real logs outside this public repository.
 - Inventory completeness depends on the operator; a valid file does not prove
   that it describes the real site accurately or securely.
 - SSH, firewall, and host-hardening changes can interrupt support services or

@@ -31,6 +31,12 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Validate example inventory
         run: python sgif_inventory.py examples/site-inventory.json
+      - name: Normalize Suricata sample
+        run: python -m application.event_ingest suricata examples/suricata-eve.sample.jsonl > /dev/null
+      - name: Normalize Zeek sample
+        run: python -m application.event_ingest zeek examples/zeek-conn.sample.jsonl > /dev/null
+      - name: Normalize Wazuh sample
+        run: python -m application.event_ingest wazuh examples/wazuh-alert.sample.jsonl > /dev/null
 
   ansible-syntax:
     runs-on: ubuntu-latest
