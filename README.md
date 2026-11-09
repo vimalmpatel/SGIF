@@ -16,7 +16,7 @@ non-production support server.
 Requires Python 3.10 or newer. From the repository root, run:
 
 ```sh
-python -m sgif_inventory examples/site-inventory.json
+python sgif_inventory.py examples/site-inventory.json
 ```
 
 The command exits with status `0` for a valid inventory and `1` for invalid
@@ -46,8 +46,8 @@ host-specific inventory. No playbook in this repo should target OT networks.
 ## Inventory format
 
 The top-level JSON object contains an `assets` array. Every asset needs a
-unique `asset_id`, `name`, `asset_type`, `zone`, `criticality`, and `owner`.
-See [the example inventory](examples/site-inventory.json).
+unique `asset_id`, `name`, `asset_type`, `zone`, `criticality`, and
+`owner`. See [the example inventory](examples/site-inventory.json).
 
 Use role names rather than personal contact details. Do not commit real site
 inventories, credentials, network diagrams, or other sensitive operational
@@ -61,7 +61,12 @@ product or a substitute for qualified engineering, operational safety
 procedures, or applicable standards. Security controls are examples that need
 site-specific review; they are not a compliance guarantee.
 
-See [the security docs](security/architecture.md) and [threat model](security/threat-model.md)
-for assumptions, boundaries, and planned safeguards. The technical reference
-document still needs to be available as a readable file before its
-architecture and requirements can be incorporated.
+The CI workflows run unit tests, inventory validation, Ansible syntax checks,
+Ansible linting, and CodeQL analysis. The manually triggered deployment
+workflow is a syntax preflight only: it does not connect to or configure
+servers.
+
+See [the security architecture](security/architecture.md),
+[the threat model](security/threat-model.md), and
+[the security checklist](security/security-checklist.md) for the current
+design boundaries and planned safeguards.
