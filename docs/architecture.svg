@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">SGIF Ubuntu lab architecture</title>
+  <desc id="desc">An operator connects over SSH forwarding to a localhost-bound Ubuntu management stack. Keycloak authenticates dashboard users, FastAPI enforces roles, and PostgreSQL stores assets, imported events, and audit records. Wazuh, Suricata, and Zeek provide exported files only. There is no live OT control path.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#587e64"/></marker>
+    <marker id="blue-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#4c7887"/></marker>
+    <style>
+      .bg{fill:#f1f4ef}.ink{fill:#19372d}.muted{fill:#708077}.mono{font-family:monospace;font-size:12px;letter-spacing:0}.label{font-family:Arial,sans-serif;font-size:16px;font-weight:700;letter-spacing:0}.small{font-family:Arial,sans-serif;font-size:12px;letter-spacing:0}.node{fill:#fff;stroke:#d8e1d8;stroke-width:1.5}.green{fill:#eaf2e6;stroke:#a7c39d}.blue{fill:#e7f0f2;stroke:#a6c2c8}.yellow{fill:#f7f2df;stroke:#ddce91}.line{fill:none;stroke:#587e64;stroke-width:2;marker-end:url(#arrow)}.oidc{fill:none;stroke:#4c7887;stroke-width:2;marker-end:url(#blue-arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="620" rx="18"/>
+  <text x="45" y="46" class="mono" fill="#64845e">SGIF / UBUNTU MANAGEMENT LAB</text>
+  <text x="45" y="78" class="label ink" font-size="25">Imported-event review with no OT control path</text>
+
+  <rect x="45" y="125" width="220" height="125" rx="12" class="node"/>
+  <text x="68" y="162" class="label ink">Operator workstation</text>
+  <text x="68" y="190" class="small muted">Browser + SSH tunnel</text>
+  <text x="68" y="220" class="mono" fill="#4c7354">5173 · 8000 · 8080</text>
+
+  <rect x="305" y="105" width="845" height="405" rx="18" fill="#e5ece3" stroke="#c5d3c4" stroke-width="2"/>
+  <text x="333" y="140" class="mono" fill="#587a52">DEDICATED UBUNTU 22.04+ SUPPORT / LAB BOX</text>
+  <text x="333" y="162" class="small muted">Compose private network · host ports bound to 127.0.0.1</text>
+
+  <rect x="335" y="195" width="230" height="125" rx="11" class="green"/>
+  <text x="359" y="233" class="label ink">Dashboard</text>
+  <text x="359" y="259" class="small muted">React + unprivileged Nginx</text>
+  <text x="359" y="291" class="mono" fill="#4c7354">localhost:5173</text>
+
+  <rect x="625" y="195" width="230" height="125" rx="11" class="blue"/>
+  <text x="649" y="233" class="label ink">FastAPI</text>
+  <text x="649" y="259" class="small muted">JWT validation + RBAC</text>
+  <text x="649" y="291" class="mono" fill="#4c7887">localhost:8000</text>
+
+  <rect x="915" y="195" width="205" height="125" rx="11" class="yellow"/>
+  <text x="939" y="233" class="label ink">Keycloak</text>
+  <text x="939" y="259" class="small muted">OIDC / PKCE roles</text>
+  <text x="939" y="291" class="mono" fill="#927a3c">localhost:8080</text>
+
+  <rect x="625" y="370" width="495" height="105" rx="11" class="node"/>
+  <text x="653" y="407" class="label ink">PostgreSQL</text>
+  <text x="653" y="434" class="small muted">Assets · normalized events · audit records</text>
+  <text x="653" y="458" class="mono" fill="#54705f">separate app and identity databases/users</text>
+
+  <rect x="45" y="350" width="220" height="125" rx="12" class="node"/>
+  <text x="68" y="387" class="label ink">Authorized exports</text>
+  <text x="68" y="414" class="small muted">Wazuh · Suricata · Zeek</text>
+  <text x="68" y="444" class="mono" fill="#927a3c">JSONL upload only</text>
+
+  <path d="M265 187H335" class="line"/>
+  <path d="M565 257H625" class="oidc"/>
+  <text x="574" y="241" class="mono" fill="#4c7887">PKCE</text>
+  <path d="M855 257H915" class="oidc"/>
+  <text x="863" y="241" class="mono" fill="#4c7887">JWKS</text>
+  <path d="M265 411H625" class="line"/>
+  <text x="373" y="394" class="mono" fill="#587e64">bounded import</text>
+  <path d="M740 320V370" class="line"/>
+
+  <rect x="305" y="535" width="845" height="60" rx="10" fill="#f8e9df" stroke="#e8b9a2" stroke-width="1.5"/>
+  <text x="333" y="572" class="label" fill="#9c4832">No packet capture · no automatic verdict · no isolation command</text>
+</svg>

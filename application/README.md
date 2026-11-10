@@ -26,6 +26,8 @@ isolation actions. Only synthetic, documentation-range addresses belong in
 public examples. Real logs can reveal sensitive topology and must not be
 committed to this public repository.
 
-FastAPI, PostgreSQL, Keycloak/OIDC, and the dashboard are not implemented yet.
-Their trust boundaries, authentication model, data retention, and lab
-deployment must be designed before exposing a service beyond localhost.
+The FastAPI API, PostgreSQL schema, Keycloak/OIDC role checks, and React
+dashboard are included in the lab stack. They bind to localhost and are not a
+production deployment. Review [the deployment guide](../deployment/README.md)
+before starting the stack. Do not expose it beyond localhost without TLS,
+production identity settings, backup/restore, migration, and security review.

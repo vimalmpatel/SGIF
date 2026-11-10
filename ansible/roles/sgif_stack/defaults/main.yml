@@ -1,0 +1,12 @@
+---
+sgif_stack_enable: false
+sgif_stack_repository: https://github.com/vimalmpatel/SGIF.git
+sgif_stack_version: main
+sgif_stack_install_dir: /opt/sgif
+sgif_stack_postgres_user: sgif
+sgif_stack_postgres_password: ""
+sgif_stack_app_db_user: sgif_app
+sgif_stack_app_db_password: ""
+sgif_stack_keycloak_db_user: sgif_keycloak
+sgif_stack_keycloak_db_password: ""
+sgif_stack_keycloak_admin_password: ""

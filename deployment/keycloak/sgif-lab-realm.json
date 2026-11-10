@@ -1,0 +1,65 @@
+{
+  "realm": "sgif-lab",
+  "enabled": true,
+  "displayName": "SGIF Local Lab",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+  "roles": {
+    "realm": [
+      { "name": "sgif_reader", "description": "Read SGIF lab inventory and events" },
+      { "name": "sgif_operator", "description": "Import events and manage lab inventory" },
+      { "name": "sgif_admin", "description": "SGIF lab administration" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "sgif-web",
+      "name": "SGIF Web Lab",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "pkceCodeChallengeMethod": "S256",
+      "redirectUris": ["http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:5173"],
+      "defaultClientScopes": ["web-origins", "acr", "roles", "profile", "email", "sgif-api-audience"]
+    },
+    {
+      "clientId": "sgif-api",
+      "name": "SGIF API",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "bearerOnly": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "sgif-api-audience",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "sgif-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "sgif-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ]
+}

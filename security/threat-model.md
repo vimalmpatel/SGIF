@@ -3,9 +3,10 @@
 ## Purpose
 
 SGIF aims to help small renewable-energy site operators organize defensive
-cybersecurity work. The current framework consists of static inventory checks,
+cybersecurity work. The current framework includes an Ubuntu lab application
+(FastAPI, React, PostgreSQL, and Keycloak), static inventory validation,
 offline normalization of exported Wazuh/Suricata/Zeek records, and opt-in
-configuration examples for ordinary support servers.
+support-server automation.
 
 ## In scope
 
