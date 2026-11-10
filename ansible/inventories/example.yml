@@ -2,3 +2,5 @@ all:
   children:
     support_servers:
       hosts: {}
+    sgif_lab_servers:
+      hosts: {}

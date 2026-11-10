@@ -1,0 +1,138 @@
+---
+- name: Require explicit lab installation authorization
+  ansible.builtin.assert:
+    that:
+      - sgif_stack_enable | bool
+    fail_msg: "Set sgif_stack_enable=true in the protected lab vars file to install SGIF."
+
+- name: Require supported Ubuntu lab host
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_version is version("22.04", ">=")
+      - "'sgif_lab_servers' in group_names"
+      - ansible_architecture in ["x86_64", "aarch64", "arm64"]
+    fail_msg: "SGIF lab installation supports Ubuntu 22.04+ x86_64/ARM64 hosts in sgif_lab_servers."
+
+- name: Validate deployment secrets
+  ansible.builtin.assert:
+    that:
+      - sgif_stack_postgres_password | length >= 32
+      - sgif_stack_app_db_password | length >= 32
+      - sgif_stack_keycloak_db_password | length >= 32
+      - sgif_stack_keycloak_admin_password | length >= 32
+      - sgif_stack_postgres_password is match('^[A-Za-z0-9]+$')
+      - sgif_stack_app_db_password is match('^[A-Za-z0-9]+$')
+      - sgif_stack_keycloak_db_password is match('^[A-Za-z0-9]+$')
+      - sgif_stack_keycloak_admin_password is match('^[A-Za-z0-9]+$')
+      - sgif_stack_postgres_password != sgif_stack_keycloak_admin_password
+      - sgif_stack_postgres_password != sgif_stack_app_db_password
+      - sgif_stack_postgres_password != sgif_stack_keycloak_db_password
+      - sgif_stack_postgres_password != sgif_stack_keycloak_admin_password
+      - sgif_stack_app_db_password != sgif_stack_keycloak_db_password
+      - sgif_stack_app_db_password != sgif_stack_keycloak_admin_password
+      - sgif_stack_keycloak_db_password != sgif_stack_keycloak_admin_password
+    fail_msg: >-
+      Supply different, alphanumeric secrets of at least 32 characters through
+      Ansible Vault. Do not put secret values in inventory or source control.
+  no_log: true
+
+- name: Install Docker repository prerequisites
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - git
+      - python3-debian
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Create APT keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download Docker's official APT signing key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configure Docker's official Ubuntu repository
+  ansible.builtin.deb822_repository:
+    name: docker
+    types:
+      - deb
+    uris:
+      - https://download.docker.com/linux/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components:
+      - stable
+    architectures:
+      - "{{ 'arm64' if ansible_architecture in ['aarch64', 'arm64'] else 'amd64' }}"
+    signed_by: /etc/apt/keyrings/docker.asc
+    state: present
+
+- name: Install Docker Engine and Compose plugin
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Enable and start Docker
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Check out the selected SGIF source revision
+  ansible.builtin.git:
+    repo: "{{ sgif_stack_repository }}"
+    dest: "{{ sgif_stack_install_dir }}"
+    version: "{{ sgif_stack_version }}"
+    depth: 1
+    update: true
+  register: sgif_stack_source_checkout
+
+- name: Write protected Compose environment file
+  ansible.builtin.copy:
+    dest: "{{ sgif_stack_install_dir }}/.env"
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      POSTGRES_USER=sgif
+      POSTGRES_PASSWORD={{ sgif_stack_postgres_password }}
+      SGIF_DB_USER={{ sgif_stack_app_db_user }}
+      SGIF_DB_PASSWORD={{ sgif_stack_app_db_password }}
+      KEYCLOAK_DB_USER={{ sgif_stack_keycloak_db_user }}
+      KEYCLOAK_DB_PASSWORD={{ sgif_stack_keycloak_db_password }}
+      KEYCLOAK_ADMIN=sgif-admin
+      KEYCLOAK_ADMIN_PASSWORD={{ sgif_stack_keycloak_admin_password }}
+  no_log: true
+  register: sgif_stack_environment_file
+
+- name: Start or update the SGIF lab stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ sgif_stack_install_dir }}"
+    state: present
+    build: always
+    pull: missing
+    wait: true
+    wait_timeout: 300
+  register: sgif_stack_compose
+
+- name: Report deployment endpoint
+  ansible.builtin.debug:
+    msg: "SGIF lab stack is available on the Ubuntu host at http://127.0.0.1:5173."

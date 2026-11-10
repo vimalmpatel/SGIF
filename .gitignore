@@ -2,7 +2,6 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
-.env
 .ansible/
 *.retry
 *.vault.yml
@@ -12,3 +11,9 @@ ansible/inventories/production.yml
 ansible/inventories/host_vars/
 ansible/inventories/group_vars/
 *.log
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example

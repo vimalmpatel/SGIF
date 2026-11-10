@@ -27,10 +27,39 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install API dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
       - name: Validate example inventory
         run: python sgif_inventory.py examples/site-inventory.json
+      - name: Normalize Suricata sample
+        run: python -m application.event_ingest suricata examples/suricata-eve.sample.jsonl > /dev/null
+      - name: Normalize Zeek sample
+        run: python -m application.event_ingest zeek examples/zeek-conn.sample.jsonl > /dev/null
+      - name: Normalize Wazuh sample
+        run: python -m application.event_ingest wazuh examples/wazuh-alert.sample.jsonl > /dev/null
+
+  web-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: application/web/package-lock.json
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: application/web
+      - name: Build dashboard
+        run: npm run build
+        working-directory: application/web
 
   ansible-syntax:
     runs-on: ubuntu-latest
@@ -49,8 +78,10 @@ jobs:
       - name: Install Ansible tooling
         run: python -m pip install --disable-pip-version-check ansible-core ansible-lint
       - name: Install required collections
-        run: ansible-galaxy collection install ansible.posix community.general
+        run: ansible-galaxy collection install -r ansible/requirements.yml
       - name: Check playbook syntax (no hosts contacted)
         run: ansible-playbook -i ansible/inventories/example.yml ansible/playbooks/site.yml --syntax-check
+      - name: Check Ubuntu installer syntax (no hosts contacted)
+        run: ansible-playbook -i ansible/inventories/example.yml ansible/playbooks/install_lab.yml --syntax-check
       - name: Lint playbook
-        run: ansible-lint ansible/playbooks/site.yml
+        run: ansible-lint ansible/playbooks/site.yml ansible/playbooks/install_lab.yml

@@ -1,0 +1,1 @@
+{"timestamp":"2026-11-09T12:30:00Z","rule":{"level":13,"description":"Synthetic lab finding"},"agent":{"name":"lab-endpoint"},"data":{"srcip":"192.0.2.12","dstport":"443","protocol":"TCP"}}

@@ -6,10 +6,24 @@ examples in this repository are for **Debian/Ubuntu support servers only**.
 They are not for inverters, turbines, protection relays, controllers, or other
 operational technology (OT).
 
-The repository includes a local asset inventory validator and opt-in Ansible
-roles. The validator reads a local file only. Ansible roles make changes only
-when explicitly enabled and should first be reviewed and tested on a
-non-production support server.
+The repository includes an OIDC-protected API and dashboard lab stack, an
+offline Wazuh/Suricata/Zeek event normalizer, an asset inventory validator,
+and Ansible examples. The Ubuntu installer deploys the application stack to a
+dedicated lab/support server using Docker Compose. It does not configure live
+OT equipment or network sensors.
+
+## Architecture
+
+![SGIF Ubuntu lab architecture](docs/architecture.svg)
+
+The diagram shows the current management-lab boundary: event exports are
+uploaded by an operator; no live packet capture or OT command path exists.
+See the [complete architecture guide](docs/architecture.md) for components,
+roles, data flows, network boundaries, and limitations.
+
+Follow the [implementation guide](docs/implementation-guide.md) for Ubuntu
+prerequisites, Ansible Vault setup, installation, first login, event import,
+operations, and troubleshooting.
 
 ## Quick start
 
@@ -18,6 +32,19 @@ Requires Python 3.10 or newer. From the repository root, run:
 ```sh
 python sgif_inventory.py examples/site-inventory.json
 ```
+
+Normalize synthetic Wazuh alert, Suricata EVE, or Zeek `conn.log` JSON records
+to a common JSONL format:
+
+```sh
+python -m application.event_ingest suricata examples/suricata-eve.sample.jsonl
+python -m application.event_ingest zeek examples/zeek-conn.sample.jsonl
+python -m application.event_ingest wazuh examples/wazuh-alert.sample.jsonl
+```
+
+Normalized events are written to standard output. The tool does not capture
+traffic, connect to sensors, determine whether an alert is a confirmed
+incident, or perform isolation actions. See [the application guide](application/README.md).
 
 The command exits with status `0` for a valid inventory and `1` for invalid
 data. Run the tests with:
@@ -32,6 +59,12 @@ Requires a supported Ansible installation and an operator-managed inventory.
 The committed example inventory has no hosts. It is intentionally not a
 production inventory. Review [the Ansible guide](ansible/README.md) before
 using any role. All role enable flags default to `false`.
+
+To provision the Ubuntu lab stack, see the [Ansible install guide](ansible/README.md).
+The deployment uses Docker Compose, PostgreSQL, Keycloak, FastAPI, and the
+React dashboard. Service ports bind to localhost; use an SSH tunnel for remote
+administration. For a local disposable Compose lab, see
+[the deployment guide](deployment/README.md).
 
 Check playbook syntax without connecting to a host:
 
@@ -61,10 +94,11 @@ product or a substitute for qualified engineering, operational safety
 procedures, or applicable standards. Security controls are examples that need
 site-specific review; they are not a compliance guarantee.
 
-The CI workflows run unit tests, inventory validation, Ansible syntax checks,
-Ansible linting, and CodeQL analysis. The manually triggered deployment
-workflow is a syntax preflight only: it does not connect to or configure
-servers.
+The CI workflows run API and inventory tests, event sample validation, a
+React production build, Ansible syntax/lint checks, and CodeQL. The manually
+triggered GitHub deployment workflow is still a syntax preflight only; it does
+not connect to servers. The application stores explicitly imported events and
+has no automatic verdict or isolation action.
 
 See [the security architecture](security/architecture.md),
 [the threat model](security/threat-model.md), and

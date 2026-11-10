@@ -1,0 +1,7 @@
+---
+- name: Install SGIF lab stack on a dedicated Ubuntu support box
+  hosts: sgif_lab_servers
+  gather_facts: true
+  become: true
+  roles:
+    - role: sgif_stack

@@ -3,12 +3,16 @@
 ## Purpose
 
 SGIF aims to help small renewable-energy site operators organize defensive
-cybersecurity work. The initial framework consists of static inventory checks
-and opt-in configuration examples for ordinary support servers.
+cybersecurity work. The current framework includes an Ubuntu lab application
+(FastAPI, React, PostgreSQL, and Keycloak), static inventory validation,
+offline normalization of exported Wazuh/Suricata/Zeek records, and opt-in
+support-server automation.
 
 ## In scope
 
 - Validating a manually maintained JSON asset inventory.
+- Normalizing local, exported Wazuh alerts, Suricata EVE, and Zeek `conn.log`
+  JSON files.
 - Demonstrating conservative host-hardening patterns for Debian/Ubuntu
   support servers.
 - Reviewing code and synthetic test data in CI without site connectivity.
@@ -16,6 +20,8 @@ and opt-in configuration examples for ordinary support servers.
 ## Out of scope
 
 - Asset discovery by probing networks or communicating with equipment.
+- Live network monitoring, alert correlation, incident verdicts, or automated
+  isolation actions.
 - Exploiting, bypassing, or stress-testing site devices or services.
 - Sending commands to inverters, turbines, protection relays, controllers, or
   other OT.
@@ -26,6 +32,8 @@ and opt-in configuration examples for ordinary support servers.
 
 - **Accidental disclosure:** real inventories, secrets, and host-specific
   files are excluded or ignored; published examples must remain fictional.
+- **Sensitive event data:** exported network logs may disclose site topology;
+  keep real logs outside the public repository and access-controlled.
 - **Administrative lockout or outage:** roles default to disabled, target only
   the `support_servers` group, and require operator review, recovery access,
   and a staged rollout.

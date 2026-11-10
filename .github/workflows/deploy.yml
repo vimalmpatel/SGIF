@@ -26,8 +26,10 @@ jobs:
       - name: Install Ansible
         run: python -m pip install --disable-pip-version-check ansible-core
       - name: Install required collections
-        run: ansible-galaxy collection install ansible.posix community.general
+        run: ansible-galaxy collection install -r ansible/requirements.yml
       - name: Check playbook syntax (no hosts contacted)
         run: ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i ansible/inventories/example.yml ansible/playbooks/site.yml --syntax-check
+      - name: Check Ubuntu installer syntax (no hosts contacted)
+        run: ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i ansible/inventories/example.yml ansible/playbooks/install_lab.yml --syntax-check
       - name: Explain deployment boundary
         run: echo "Preflight only. This workflow does not connect to or configure site hosts."
